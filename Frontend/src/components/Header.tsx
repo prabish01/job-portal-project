@@ -1,6 +1,8 @@
+"use client";
 import React from "react";
 import { Button } from "./ui/button";
 import { LogIn } from "lucide-react";
+import Link from "next/link";
 
 export const Header = () => {
   return (
@@ -8,6 +10,13 @@ export const Header = () => {
       <header className="border-b">
         <div className="container max-w-8xl">
           <nav className="flex items-center justify-between h-16">
+            <Link href='/'>
+            <div className="textWrapper">
+              <p className="text-xl font-bold">Job Portal</p>
+              <div className="invertbox"></div>
+            </div>
+            </Link>
+
             <ul className="flex space-x-6">
               <li className="relative group">
                 <a href="#" className="text-sm flex items-center h-16 hover:text-blue-500 transition-colors">
@@ -67,12 +76,14 @@ export const Header = () => {
                 </a>
               </li>
             </ul>
-            <Button variant="default" className="bg-blue-500 hover:bg-blue-600 transition-colors">
-              <span className="mr-2">
-                <LogIn />
-              </span>{" "}
-              Login
-            </Button>
+            <Link href="/signin">
+              <Button variant="default" className="bg-blue-500 hover:bg-blue-600 transition-colors">
+                <span className="mr-2">
+                  <LogIn />
+                </span>{" "}
+                Login
+              </Button>
+            </Link>
           </nav>
         </div>
       </header>
