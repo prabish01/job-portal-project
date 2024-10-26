@@ -22,5 +22,6 @@ Route::post('jobseeker/login',[UserController::class,'login']);
 Route::group(['middleware' => 'auth:jobseeker_api'], function () {
     Route::prefix('jobseeker')->group(function(){
         Route::post('logout',[UserController::class,'logout']);
+        Route::post('change-password',[UserController::class,'changePassword']);
     });
 });
