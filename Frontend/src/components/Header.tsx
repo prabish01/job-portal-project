@@ -1,23 +1,62 @@
 "use client";
+
 import React from "react";
 import { Button } from "./ui/button";
 import { LogIn } from "lucide-react";
 import Link from "next/link";
+import { auth } from "../../auth";
+import { handleLogoutAction } from "../../action/authAction";
+import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
+import UserAccountNav from "./UserAccountNav";
 
-export const Header = () => {
+interface HeaderProps {
+  session: any;
+}
+
+export const Header = ({ session }: HeaderProps) => {
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "top-end",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.addEventListener("mouseenter", Swal.stopTimer);
+      toast.addEventListener("mouseleave", Swal.resumeTimer);
+    },
+  });
+  // const getSession = await auth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const response = await handleLogoutAction();
+    router.refresh();
+    router.push("/signin");
+    router.refresh();
+    Toast.fire({
+      icon: "success",
+      title: `You have been logged out`,
+    });
+
+    // if (response?.success) {
+    //   // Navigate client-side on success
+    // }
+  };
+
   return (
     <>
       <header className="border-b">
         <div className="container max-w-8xl">
           <nav className="flex items-center justify-between h-16">
-            <Link href='/'>
-            <div className="textWrapper">
-              <p className="text-xl font-bold">Job Portal</p>
-              <div className="invertbox"></div>
-            </div>
+            <Link href="/">
+              <div className="textWrapper">
+                <p className="text-xl font-bold">Job Portal</p>
+                <div className="invertbox"></div>
+              </div>
             </Link>
 
-            <ul className="flex space-x-6">
+            <ul className="flex space-x-16">
               <li className="relative group">
                 <a href="#" className="text-sm flex items-center h-16 hover:text-blue-500 transition-colors">
                   Job Category
@@ -76,14 +115,30 @@ export const Header = () => {
                 </a>
               </li>
             </ul>
-            <Link href="/signin">
-              <Button variant="default" className="bg-blue-500 hover:bg-blue-600 transition-colors">
-                <span className="mr-2">
-                  <LogIn />
-                </span>{" "}
-                Login
-              </Button>
-            </Link>
+
+            {session ? (
+              <>
+                <form action={handleLogout}>
+                  <Button type="submit" variant="destructive" className=" bg-red-400 text-white transition-all ">
+                    Logout
+                  </Button>
+                </form>
+                <div>
+                  <UserAccountNav />
+                </div>
+              </>
+            ) : (
+              <>
+                <Link href="/signin">
+                  <Button variant="default" className="bg-blue-500 hover:bg-blue-600 transition-colors">
+                    <span className="mr-2">
+                      <LogIn />
+                    </span>{" "}
+                    Login
+                  </Button>
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       </header>

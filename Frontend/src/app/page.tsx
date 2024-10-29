@@ -2,10 +2,12 @@ import BrowseSection from "@/components/BrowseSection";
 import JobLists from "@/components/JobLists";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import { SessionProvider } from "next-auth/react";
+
 
 export default function Home() {
   return (
-    <>
+    <SessionProvider>
       <section className="mt-32 mb-32">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center container p-8 bg-white">
           <div>
@@ -45,7 +47,7 @@ export default function Home() {
         </div>
         <JobLists />
       </section>
-    </>
+    </SessionProvider>
   );
 }
 
