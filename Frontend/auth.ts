@@ -46,7 +46,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           }
 
           const data = await response.json();
-          console.log("Data", data);
+          // console.log("Data", data);
 
           if (data.success) {
             console.log("Dataaaaa");
@@ -71,7 +71,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return token;
     },
     async session({ token, session }: any) {
-      // console.log("user", session.user);
+      // // print email and name
+      // console.log("email", session?.user.email);
+      // console.log("user", session?.user.name);
 
       // console.log("token", token);
       // console.log("session", session);

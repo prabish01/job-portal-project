@@ -13,7 +13,6 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({
-  
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -23,7 +22,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header session={session} />
+        <Header session={session} user={session?.user as any} />
         {children}
         <Footer />
       </body>
