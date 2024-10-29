@@ -8,6 +8,12 @@ export interface ResumeProfile {
 }
 
 export interface ResumeWorkExperience {
+  role: string | number | readonly string[] | undefined;
+  location: string | number | readonly string[] | undefined;
+  startDate: string | number | readonly string[] | undefined;
+  endDate: string | number | readonly string[] | undefined;
+  position: string | number | readonly string[] | undefined;
+  dateRange: string | number | readonly string[] | undefined;
   company: string;
   jobTitle: string;
   date: string;
@@ -15,6 +21,7 @@ export interface ResumeWorkExperience {
 }
 
 export interface ResumeEducation {
+  location: string | number | readonly string[] | undefined;
   school: string;
   degree: string;
   date: string;
@@ -43,6 +50,11 @@ export interface ResumeCustom {
 }
 
 export interface Resume {
+  name: string | number | readonly string[] | undefined;
+  email: string | number | readonly string[] | undefined;
+  phone: string | number | readonly string[] | undefined;
+  location: string | number | readonly string[] | undefined;
+  summary: string | number | readonly string[] | undefined;
   profile: ResumeProfile;
   workExperiences: ResumeWorkExperience[];
   educations: ResumeEducation[];

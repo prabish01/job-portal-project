@@ -10,7 +10,7 @@ import { resetPasswordValidation } from "../../../action/validation";
 import { useForm } from "react-hook-form";
 
 export default function Page() {
-  const [isPending, setPending] = useState();
+  const [isPending, setPending] = useState(false);
 
   type ResetValues = z.infer<typeof resetPasswordValidation>;
 
@@ -27,8 +27,25 @@ export default function Page() {
     formState: { errors },
   } = resetForm;
 
-  const onSubmit = (values: ResetValues) => {
+
+
+  const onSubmit = async(values: ResetValues) => {
     console.log(values);
+    setPending(true);
+    try {
+      const resetResponse = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/jobseeker/reset-password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+    }catch(error) {
+      console.log(error);
+    }finally {
+      setPending(false);
+    }
+
   };
   return (
     <div className="min-h-screen gird place-content-center mx-auto">
