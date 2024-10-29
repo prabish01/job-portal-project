@@ -4,12 +4,15 @@ namespace App\Http\Controllers\JobSeekerApi;
 
 use App\Http\Controllers\Controller;
 use App\Models\JobSeeker;
+use App\Notifications\EmailVerificationNotification;
+use App\Notifications\OTPNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
+use Str;
 
 class UserController extends Controller
 {
@@ -119,11 +122,124 @@ class UserController extends Controller
 
         $token = Password::createToken($user);
 
-        $user->notify(new OTPNotification($otp, $token, $request->email, 'student'));
+        $user->notify(new OTPNotification($otp, $token, $request->email, 'jobseeker'));
         $user->otp = $otp;
         $user->otp_expires_at = now()->addMinutes(60);
         $user->token = $token;
         $user->save();
         return response()->json(['success' => true, 'message' => 'OTP and reset link sent to email.'], 200);
+    }
+    public function verifyToken(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+        ]);
+
+        $user = JobSeeker::where('token', $request->token)->first();
+        if (!$user) {
+            return response()->json(['error' => 'true', 'message' => 'Unidentified token.'], 400);
+        }
+
+        if (!Password::tokenExists($user, $request->token)) {
+            return response()->json(['error' => true, 'message' => 'Invalid or expired reset token'], 400);
+        }
+        $token = Password::createToken($user);
+        $user->token = $token;
+        $user->save();
+        return response()->json(['success' => true, 'message' => 'The token is valid.', 'data' => ['isValid' => true, 'token' => $token]], 200);
+    }
+
+    public function verifyOTP(Request $request)
+    {
+        $request->validate([
+            'otp' => 'required|integer',
+        ]);
+
+        $user = JobSeeker::where('otp', $request->otp)->first();
+        if (!$user) {
+            return response()->json(['error' => 'true', 'message' => 'Invalid OTP'], 400);
+        }
+
+        if ($user->otp_expires_at < now()) {
+            return response()->json(['error' => true, 'message' => 'OTP has expired'], 400);
+        }
+
+
+        return response()->json(['success' => true, 'message' => 'OTP verified.', 'data' => ['token' => $user->token]], 200);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'token' => 'required',
+            'password' => 'required|min:4|confirmed',
+
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => true, 'errors' => $validator->errors(), 'message' => MessageHelper::getErrorMessage('form')], 422);
+        }
+        $user = JobSeeker::where('token', $request->token)->first();
+
+        if (!$user) {
+            return response()->json(['error' => true, 'message' => 'Invalid or expired reset token'], 400);
+        }
+
+
+        if (!Password::tokenExists($user, $request->token)) {
+            return response()->json(['error' => true, 'message' => 'Invalid or expired reset token'], 400);
+        }
+
+        if (Hash::check($request->password, $user->password)) {
+            return response()->json(['error' => true, 'message' => 'New password cannot be same as old password.'], 400);
+        }
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        $user->otp = null;
+        $user->otp_expires_at = null;
+        $user->token = null;
+        $user->save();
+
+        Password::deleteToken($user);
+
+
+        return response()->json(['success' => true, 'message' => 'Password has been reset.'], 200);
+    }
+    public function sendVerificationEmail()
+    {
+        $user = JobSeeker::where('id', Auth::id())->first();
+        if (!$user) {
+            return response()->json(['error' => true, 'message' => 'Please try again']);
+        }
+        if ($user->email_verified_at) {
+            return response()->json(['error' => 'Email is already verified.'], 400);
+        }
+        $token = Str::random(16);
+        $user->notify(new EmailVerificationNotification($student->id, $token));
+        $user->verification_code = $token;
+        $user->save();
+
+        return response()->json(['success' => true, 'message' => 'Verification email sent.'], 200);
+    }
+
+    public function verifyEmail($id, $token)
+    {
+
+        $user = JobSeeker::where('id', $id)->first();
+
+        if (!$user) {
+            return response()->json(['error' => true, 'message' => 'User not found.'], 400);
+        }
+
+        if ($user->verification_code !== $token) {
+            return response()->json(['error' => true, 'message' => 'Token is invalid.'], 400);
+        }
+
+        $user->email_verified_at = now();
+        $user->verification_code = null;
+        $user->save();
+
+        return response()->json(['success' => true, 'message' => 'Email verified.'], 200);
     }
 }
