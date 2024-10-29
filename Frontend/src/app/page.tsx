@@ -3,9 +3,9 @@ import JobLists from "@/components/JobLists";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { SessionProvider } from "next-auth/react";
+import { auth } from "../../auth";
 
-
-export default function Home() {
+export default async function Home() {
   return (
     <SessionProvider>
       <section className="mt-32 mb-32">

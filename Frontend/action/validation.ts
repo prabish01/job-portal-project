@@ -21,7 +21,5 @@ export const reigsterFormValidation = z
   });
 
 export const resetPasswordValidation = z.object({
-  email: z.string().email({
-    message: "Please enter a valid email address",
-  }),
+  email: z.string().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Invalid email address"),
 });

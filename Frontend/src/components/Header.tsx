@@ -9,46 +9,19 @@ import { handleLogoutAction } from "../../action/authAction";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import UserAccountNav from "./UserAccountNav";
+import { User } from "next-auth";
 
 interface HeaderProps {
   session: any;
+  user: Pick<User, "email" | "name">;
 }
 
-export const Header = ({ session }: HeaderProps) => {
-  const Toast = Swal.mixin({
-    toast: true,
-    position: "top-end",
-    showConfirmButton: false,
-    timer: 3000,
-    timerProgressBar: true,
-    didOpen: (toast) => {
-      toast.addEventListener("mouseenter", Swal.stopTimer);
-      toast.addEventListener("mouseleave", Swal.resumeTimer);
-    },
-  });
-  // const getSession = await auth();
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    const response = await handleLogoutAction();
-    router.refresh();
-    router.push("/signin");
-    router.refresh();
-    Toast.fire({
-      icon: "success",
-      title: `You have been logged out`,
-    });
-
-    // if (response?.success) {
-    //   // Navigate client-side on success
-    // }
-  };
-
+export const Header = ({ user, session }: HeaderProps) => {
   return (
     <>
       <header className="border-b">
         <div className="container max-w-8xl">
-          <nav className="flex items-center justify-between h-16">
+          <nav className="flex items-center justify-between align-middle h-16">
             <Link href="/">
               <div className="textWrapper">
                 <p className="text-xl font-bold">Job Portal</p>
@@ -57,7 +30,7 @@ export const Header = ({ session }: HeaderProps) => {
             </Link>
 
             <ul className="flex space-x-16">
-              <li className="relative group">
+              <li className="relative  hover:text-blue-500 transition-all    group">
                 <a href="#" className="text-sm flex items-center h-16 hover:text-blue-500 transition-colors">
                   Job Category
                   <svg className="w-4 h-4 ml-1 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -78,7 +51,7 @@ export const Header = ({ session }: HeaderProps) => {
                   </div>
                 </div>
               </li>
-              <li className="relative group">
+              <li className="relative hover:text-blue-500 group">
                 <a href="#" className="text-sm flex items-center h-16 hover:text-blue-500 transition-colors">
                   Services
                   <svg className="w-4 h-4 ml-1 transition-transform duration-200 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -118,13 +91,13 @@ export const Header = ({ session }: HeaderProps) => {
 
             {session ? (
               <>
-                <form action={handleLogout}>
-                  <Button type="submit" variant="destructive" className=" bg-red-400 text-white transition-all ">
-                    Logout
-                  </Button>
-                </form>
                 <div>
-                  <UserAccountNav />
+                  <UserAccountNav
+                    user={{
+                      email: user.email,
+                      name: user.name,
+                    }}
+                  />
                 </div>
               </>
             ) : (

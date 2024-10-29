@@ -25,7 +25,7 @@ export default function Page() {
     toast: true,
     position: "top-end",
     showConfirmButton: false,
-    timer: 3000,
+    timer: 1000,
     timerProgressBar: true,
     didOpen: (toast) => {
       toast.addEventListener("mouseenter", Swal.stopTimer);
@@ -229,11 +229,7 @@ export default function Page() {
                 <Label htmlFor="password_confirmation">Confirm Password</Label>
                 <div className="relative">
                   <Input id="password_confirmation" type={showPassword ? "text" : "password"} placeholder={"Confirm Password"} {...register("password_confirmation")} />
-                  <button
-                    type="button" 
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
+                  <button type="button" className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600" onClick={() => setShowPassword(!showPassword)}>
                     {showPassword ? <Eye /> : <EyeOff />}
                   </button>
                 </div>
