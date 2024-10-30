@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 // import { resetPasswordValidation } from "../../../action/validation";
@@ -12,6 +12,7 @@ import { resetPasswordValidation } from "../../action/validation";
 
 export default function Page() {
   const [isPending, setPending] = useState(false);
+  const [sentMessage, setSentMessage] = useState<string | null>(null);
 
   type ResetValues = z.infer<typeof resetPasswordValidation>;
 
@@ -39,15 +40,29 @@ export default function Page() {
         },
         body: JSON.stringify(values),
       });
+      const resetResponseResult = await resetResponse.json();
       console.log("-=--=-=-=-=-=-=--=-=-=======-=-=-");
       console.log(resetResponse);
-      const sentMessage = "Reset link has been sent to your email";
+      if (resetResponseResult.success) {
+        return setSentMessage(resetResponseResult.message);
+      } else {
+        return setSentMessage(resetResponseResult.message || "Something went wrong");
+      }
     } catch (error) {
       console.log(error);
     } finally {
       setPending(false);
     }
   };
+  useEffect(() => {
+    if (sentMessage) {
+      const timer = setTimeout(() => {
+        setSentMessage(null);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [sentMessage]);
   return (
     <div className="min-h-screen gird place-content-center mx-auto">
       <div className="container w-2/4 p-16 ">
@@ -60,7 +75,7 @@ export default function Page() {
             </h1>
           </div>
         </div>
-        <div className="  rounded-lg overflow-hidden h-[200px] shadow-md p-8">
+        <div className="  rounded-lg overflow-hidden shadow-md p-8">
           <form onSubmit={resetForm.handleSubmit(onSubmit)} className="space-y-5 " method="POST">
             <div className="space-y-5">
               <div className="space-y-2">
@@ -74,6 +89,7 @@ export default function Page() {
                   {isPending ? "Sending OPT" : "Reset password"}
                 </Button>
               </div>
+              <div>{sentMessage && <div className="text-center text-green-500  p-2 rounded-md">{sentMessage}</div>}</div>
             </div>
           </form>
         </div>
