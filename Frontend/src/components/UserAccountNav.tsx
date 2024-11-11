@@ -22,7 +22,7 @@ const UserAccountNav = ({ user }: UserAccountNavProps) => {
   const handleLogout = async () => {
     const response = await handleLogoutAction();
     router.refresh();
-    router.push("/signin");
+    router.push("/employer/signin");
     router.refresh();
   };
 

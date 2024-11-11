@@ -91,7 +91,7 @@ export default function Page() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
-      console.log(response);
+      // console.log(response);
       if (response?.ok) {
         Toast.fire({
           icon: "success",
@@ -129,7 +129,7 @@ export default function Page() {
                 <>
                   <p className="font-bold">Welcome to Job Portal</p>
 
-                  <p className=" text-gray-500 text-sm mt-2">Please enter your credentials</p>
+                  <p className=" text-gray-500 text-sm mt-2">Please enter your Job Seeker credentials</p>
                 </>
               ) : (
                 <>

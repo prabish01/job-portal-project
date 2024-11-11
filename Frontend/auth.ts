@@ -15,7 +15,7 @@ declare module "next-auth" {
 export const { handlers, signIn, signOut, auth } = NextAuth({
   secret: process.env.AUTH_SECRET,
   pages: {
-    signIn: "/signin",
+    signIn: "/employer/signin",
     error: "/auth/error",
   },
   providers: [
@@ -36,7 +36,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
           const { callbackUrl, ...loginCredentials } = credentials as any;
 
-          const login = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/jobseeker/login`, {
+          const login = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/employer/login`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -57,8 +57,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           //   data: loginResponse,
           //   token: loginResponse.token,
           // };
-          console.log("====================================");
-          console.log({ loginResponse });
+          // console.log("====================================");
+          // console.log({ loginResponse });
           return { ...loginResponse.data, loginResponse, token: loginResponse.token };
         } catch (error) {
           console.error("Authorization error:", error);
@@ -86,7 +86,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     async session({ session, token }: { session: any; token: any }) {
       // if (token.user) {
-      console.log("====================================");
+      // console.log("====================================");
       session.user = token.user;
 
       // session.user = {

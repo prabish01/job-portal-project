@@ -1,4 +1,4 @@
-import ResetPassword from '@/components/ForgotPassword'
+import ResetPassword from '@/components/JobSeekerForgotPassword'
 import React from 'react'
 
 const page = () => {

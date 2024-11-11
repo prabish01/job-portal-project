@@ -1,7 +1,8 @@
-import { JobSeekerProfile } from "@/components/JobseekerProfile";
+// import { JobSeekerProfile } from "@/components/JobseekerProfile";
 import React from "react";
 import { auth } from "../../../auth";
 import { get } from "http";
+import JobSeekerProfile from "@/components/JobseekerProfile";
 
 const page = async () => {
   const getSession = await auth();

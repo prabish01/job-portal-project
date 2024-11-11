@@ -39,10 +39,10 @@ export default function Page() {
   const form = useForm({
     resolver: zodResolver(isLogin ? loginFormValidation : reigsterFormValidation),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
       password_confirmation: "",
-      name: "",
       mobile: "",
       current_address: "",
       permanent_address: "",
@@ -71,7 +71,7 @@ export default function Page() {
         title: "Signed in successfully",
       });
       router.refresh();
-      router.push("/");
+      router.push("/employer/dashboard");
       router.refresh();
     } catch (error: any) {
       Toast.fire({
@@ -86,12 +86,12 @@ export default function Page() {
   const handleRegister = async (values: regFormValues) => {
     setPending(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/jobseeker/register`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/employer/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
-      console.log(response);
+      // console.log(response);
       if (response?.ok) {
         Toast.fire({
           icon: "success",
@@ -129,7 +129,7 @@ export default function Page() {
                 <>
                   <p className="font-bold">Welcome to Job Portal</p>
 
-                  <p className=" text-gray-500 text-sm mt-2">Please enter your credentials</p>
+                  <p className=" text-gray-500 text-sm mt-2">Please enter your Employer credentials</p>
                 </>
               ) : (
                 <>

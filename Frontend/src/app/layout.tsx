@@ -4,7 +4,8 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import Footer from "@/components/Footer";
 import { auth } from "../../auth";
-
+import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import QCProviderComponent from "../../providers/queryClient";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -22,10 +23,12 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header session={getSession} user={getSession?.user as any} />
-        <p>{JSON.stringify(getSession)}</p>
-        {children}
-        <Footer />
+        <QCProviderComponent>
+          <Header session={getSession} user={getSession?.user as any} />
+          {/* <p>{JSON.stringify(getSession)}</p> */}
+          {children}
+          <Footer />
+        </QCProviderComponent>
       </body>
     </html>
   );
