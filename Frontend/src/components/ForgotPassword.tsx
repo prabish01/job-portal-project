@@ -173,6 +173,7 @@ export default function Page() {
       console.log(error);
     }
   };
+  // -------------------------- useEffect to clear messages --------------------------
   useEffect(() => {
     if (sentMessage || errorMessage) {
       const timer = setTimeout(() => {

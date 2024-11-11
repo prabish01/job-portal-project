@@ -17,12 +17,13 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await auth(); // Fetch session data on the server side
+  const getSession = await auth(); // Fetch session data on the server side
 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header session={session} user={session?.user as any} />
+        <Header session={getSession} user={getSession?.user as any} />
+        <p>{JSON.stringify(getSession)}</p>
         {children}
         <Footer />
       </body>

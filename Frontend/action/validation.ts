@@ -1,3 +1,4 @@
+import { current } from "@reduxjs/toolkit";
 import * as z from "zod";
 
 export const loginFormValidation = z.object({
@@ -37,3 +38,70 @@ export const resetPassword = z
     message: "Passwords do not match",
     path: ["password_confirmation"],
   });
+
+export const profileFormValidation = z.object({
+  // name: z.string().min(1, "Name is required"),
+  // email: z.string().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Invalid email address"),
+  // location: z.string().min(1, "Location is required"),
+  // phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  professional_summary: z.string().min(1, "Professional summary is required").optional(),
+  current_address: z.string().min(1, "Current address is required").optional(),
+  permanent_address: z.string().min(1, "Permanent address is required").optional(),
+  image: z
+    .instanceof(File) // Check if the input is an instance of File
+    .refine((file) => ["image/jpeg", "image/png"].includes(file.type), {
+      message: "Only JPEG and PNG formats are allowed.",
+    })
+    .refine((file) => file.size <= 1 * 1024 * 1024, {
+      // 5 MB size limit
+      message: "File size should not exceed 1MB.",
+    })
+    .nullable()
+    .optional(),
+  citizenship_front_image: z
+    .instanceof(File) // Check if the input is an instance of File
+    .refine((file) => ["image/jpeg", "image/png"].includes(file.type), {
+      message: "Only JPEG and PNG formats are allowed.",
+    })
+    .refine((file) => file.size <= 1 * 1024 * 1024, {
+      // 5 MB size limit
+      message: "File size should not exceed 1MB.",
+    })
+    .nullable()
+    .optional(),
+  citizenship_back_image: z
+    .instanceof(File) // Check if the input is an instance of File
+    .refine((file) => ["image/jpeg", "image/png"].includes(file.type), {
+      message: "Only JPEG and PNG formats are allowed.",
+    })
+    .refine((file) => file.size <= 1 * 1024 * 1024, {
+      // 5 MB size limit
+      message: "File size should not exceed 1MB.",
+    })
+    .nullable()
+    .optional(),
+
+  skills: z.string().min(1, "Skills are required").optional(),
+  looking_for_job: z.boolean().optional(),
+  educations: z
+    .array(
+      z.object({
+        institution: z.string().min(1, "Institution is required"),
+        board: z.string().min(1, "Board/University is required"),
+        graduation_year: z.string().regex(/^\d{4}$/, "Must be a valid year"),
+        gpa: z.string().regex(/^\d+(\.\d+)?$/, "Must be a valid number"),
+      })
+    )
+    .optional(),
+  work_experiences: z
+    .array(
+      z.object({
+        title: z.string().min(1, "Job title is required"),
+        company_name: z.string().min(1, "Company name is required"),
+        joined_date: z.string().min(1, "Start date is required"),
+        end_date: z.string().optional(),
+        currently_working: z.boolean(),
+      })
+    )
+    .optional(),
+});

@@ -3,7 +3,6 @@
 import * as z from "zod";
 import { loginFormValidation } from "./validation";
 import { signIn, signOut } from "../auth";
-import { AuthError } from "next-auth";
 
 export const handleLoginAction = async (values: z.infer<typeof loginFormValidation>) => {
   const { email, password } = values;
@@ -12,8 +11,8 @@ export const handleLoginAction = async (values: z.infer<typeof loginFormValidati
     const response = await signIn("credentials", {
       email,
       password,
-      // redirectTo: "/",
-      redirect: false,
+      redirectTo: "/",
+      // redirect: false,
     });
     return response;
   } catch (error: any) {

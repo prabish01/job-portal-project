@@ -1,87 +1,113 @@
-import NextAuth, { AuthError, type DefaultSession } from "next-auth";
+import NextAuth, { AuthError } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import Google from "next-auth/providers/google";
-import Linkedin from "next-auth/providers/linkedin";
 
 declare module "next-auth" {
-  /**
-   * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
-   */
   interface Session {
     user: {
-      /** The user's postal address. */
-      token: string;
-      /**
-       * By default, TypeScript merges new interface properties and overwrites existing ones.
-       * In this case, the default session user properties will be overwritten,
-       * with the new ones defined above. To keep the default session user properties,
-       * you need to add them back into the newly declared interface.
-       */
-    } & DefaultSession["user"];
+      [key: string]: any; // Allows access to all properties dynamically
+    };
+  }
+  interface User {
+    [key: string]: any; // Allows storing the full user object
   }
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  //   secret: "IsdauJWM/nHMdxgV4vgcuoEKvdVMWI4bTNAUXtECuio=",
+  secret: process.env.AUTH_SECRET,
+  pages: {
+    signIn: "/signin",
+    error: "/auth/error",
+  },
   providers: [
-    // Google,
-    // Linkedin,
     Credentials({
       credentials: {
-        email: { label: "email", type: "email" },
-        password: { label: "password", type: "password" },
+        email: { type: "email" },
+        password: { type: "password" },
       },
       async authorize(credentials) {
         try {
-          const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/jobseeker/login`, {
+          if (!credentials?.email || !credentials?.password) {
+            throw new AuthError("Email and password are required");
+          }
+
+          if (!process.env.NEXT_PUBLIC_BACKEND_URL) {
+            throw new Error("Backend URL is not configured");
+          }
+
+          const { callbackUrl, ...loginCredentials } = credentials as any;
+
+          const login = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/jobseeker/login`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
+              Accept: "application/json",
             },
-            body: JSON.stringify(credentials),
+            body: JSON.stringify(loginCredentials),
+            signal: AbortSignal.timeout(10000),
           });
 
-          if (!credentials) {
-            throw new Error("Credentials not found");
+          const loginResponse = await login.json();
+
+          if (!login.ok || !loginResponse.success) {
+            throw new AuthError(loginResponse.message || "Login failed");
           }
 
-          const data = await response.json();
-          // console.log("Data", data);
-
-          if (data.success) {
-            console.log("Dataaaaa");
-            return data;
-          }
-          if (data.error) {
-            console.log("Errorrrrr", data.message);
-            throw new AuthError(data.message);
-          }
+          // Return user object based on the API response
+          // return {
+          //   data: loginResponse,
+          //   token: loginResponse.token,
+          // };
+          console.log("====================================");
+          console.log({ loginResponse });
+          return { ...loginResponse.data, loginResponse, token: loginResponse.token };
         } catch (error) {
-          throw error;
+          console.error("Authorization error:", error);
+          if (error instanceof AuthError) {
+            throw error;
+          }
+          throw new AuthError(error instanceof Error ? error.message : "Login failed");
         }
       },
     }),
   ],
-  pages: {
-    signIn: "/signin",
-  },
   callbacks: {
-    async jwt(token) {
-      // console.log(token);
+    async jwt({ token, user }) {
+      if (user) {
+        // Update token with user data
+        token.user = user;
+        // token.user = {
+        //   id: user.id,
+        //   name: user.name,
+        //   email: user.email,
+        //   token: user.token,
+        // };
+      }
       return token;
     },
-    async session({ token, session }: any) {
-      // // print email and name
-      // console.log("email", session?.user.email);
-      // console.log("user", session?.user.name);
+    async session({ session, token }: { session: any; token: any }) {
+      // if (token.user) {
+      console.log("====================================");
+      session.user = token.user;
 
-      // console.log("token", token);
-      // console.log("session", session);
-
-      return token;
+      // session.user = {
+      //   id: token.user.id,
+      //   name: token.user.name,
+      //   email: token.user.email,
+      //   token: token.user.token,
+      // };
+      // }
+      return session;
     },
-    async redirect({ baseUrl }) {
+    async redirect({ url, baseUrl }) {
       return baseUrl;
     },
+  },
+  events: {
+    async signIn({ user }) {
+      console.log(`User signed in: ${user.email}`);
+    },
+    // async error(error:any) {
+    //   console.error("Auth error:", error);
+    // },
   },
 });

@@ -55,27 +55,24 @@ export default function Page() {
     formState: { errors },
   } = form;
 
-  
   const handleLogin = async (values: logFormValues) => {
     setPending(true);
     try {
       const response = await handleLoginAction(values);
-      console.log("rrrrrrrrrrrr");
-      console.log(response);
+      console.log({ response });
       if (response.error) {
         Toast.fire({
           icon: "error",
           title: `${response.message}`,
         });
-      } else {
-        Toast.fire({
-          icon: "success",
-          title: "Signed in successfully",
-        });
-        router.refresh();
-        router.push("/");
-        router.refresh();
       }
+      Toast.fire({
+        icon: "success",
+        title: "Signed in successfully",
+      });
+      router.refresh();
+      router.push("/");
+      router.refresh();
     } catch (error: any) {
       Toast.fire({
         icon: "error",
