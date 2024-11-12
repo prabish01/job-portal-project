@@ -6,17 +6,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle, Briefcase, Users, Eye } from "lucide-react";
 import { get } from "http";
 import { useQuery } from "@tanstack/react-query";
-
-interface EmployerDashboardProps {
-  session: any;
-  user: any;
-}
+import Link from "next/link";
+import getSession from "@/app/SessionProvider";
 
 type JobData = {
   data: any[];
   job: any;
 };
-export default function EmployerDashboard({ user }: EmployerDashboardProps) {
+export default function EmployerDashboard() {
+  const session = getSession();
   //   const [jobData, setJobData] = useState<JobData | null>(null);
 
   const { isPending, error, data } = useQuery<JobData>({
@@ -26,7 +24,7 @@ export default function EmployerDashboard({ user }: EmployerDashboardProps) {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${user?.token}`, // Pass Bearer token here
+          Authorization: `Bearer ${session?.token}`, // Pass Bearer token here
         },
       }).then((res) => res.json()),
   });
@@ -36,8 +34,8 @@ export default function EmployerDashboard({ user }: EmployerDashboardProps) {
   if (error) return "An error has occurred: " + error.message;
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">Welcome back, {user?.name}</h1>
+    <div className="container min-h-screen mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6">Welcome back, {session?.name}</h1>
       {/* print job name */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <Card>
@@ -46,7 +44,7 @@ export default function EmployerDashboard({ user }: EmployerDashboardProps) {
             <Briefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{JSON.stringify(data?.data.length)}</div>
+            <div className="text-2xl font-bold">{data?.data.length}</div>
           </CardContent>
         </Card>
         <Card>
@@ -73,8 +71,8 @@ export default function EmployerDashboard({ user }: EmployerDashboardProps) {
           <CardContent>
             <ul className="space-y-2">
               {data.data?.map((job: any) => (
-                <li key={job.id} className="flex justify-between items-center">
-                  <span className="hover:bg-gray-100 w-full rounded-lg p-2">{job.title}</span>
+                <li key={job.id} className="flex  justify-between items-center">
+                  <span className="hover:bg-gray-100 cursor-pointer w-full rounded-lg p-2">{job.title}</span>
                   {/* <span className="text-sm text-muted-foreground">{job.applicants} applicants</span> */}
                 </li>
               ))}
@@ -91,9 +89,12 @@ export default function EmployerDashboard({ user }: EmployerDashboardProps) {
       </div>
 
       <div className="mt-6 flex justify-end space-x-4">
-        <Button>
-          <PlusCircle className="mr-2 h-4 w-4" /> Post New Job
-        </Button>
+        <Link href="/employer/postjob">
+          <Button>
+            <PlusCircle className="mr-2 h-4 w-4" /> Post New Job
+          </Button>
+        </Link>
+
         <Button variant="outline">View All Applications</Button>
       </div>
     </div>

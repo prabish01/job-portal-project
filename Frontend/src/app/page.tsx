@@ -1,9 +1,11 @@
+"use client";
+
 import BrowseSection from "@/components/BrowseSection";
 import JobLists from "@/components/JobLists";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { SessionProvider } from "next-auth/react";
 import { auth } from "../../auth";
+import { SessionProvider } from "./SessionProvider";
 
 export default async function Home() {
   return (

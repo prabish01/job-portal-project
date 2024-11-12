@@ -11,9 +11,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { loginFormValidation, reigsterFormValidation } from "../../action/validation";
 import { useRouter } from "next/navigation";
-import { handleLoginAction } from "../../action/authAction";
 import Swal from "sweetalert2";
 import { Eye, EyeOff } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { employerLoginService } from "../../authentication";
 
 export default function Page() {
   const router = useRouter();
@@ -55,29 +56,34 @@ export default function Page() {
     formState: { errors },
   } = form;
 
-  const handleLogin = async (values: logFormValues) => {
-    setPending(true);
-    try {
-      const response = await handleLoginAction(values);
-      // console.log({ response });
-      if (response.error) {
-        Toast.fire({
-          icon: "error",
-          title: `${response.message}`,
-        });
-      }
+  const loginMutation = useMutation({
+    mutationFn: employerLoginService,
+    onSuccess: (data) => {
       Toast.fire({
         icon: "success",
-        title: "Signed in successfully",
+        title: `${data.message}`,
       });
-      router.refresh();
-      router.push("/employer/dashboard");
-      router.refresh();
-    } catch (error: any) {
+
+      // console.log("---------data----------", data);
+      // window.location.href = "/";
+      // window.location.reload();
+      window.location.href = "/employer/dashboard";
+    },
+    onError: (data) => {
       Toast.fire({
         icon: "error",
-        title: `${error.message}`,
+        title: `${data.message}`,
       });
+      console.error("Login error:", data);
+    },
+  });
+  const handleLogin = async (values: logFormValues) => {
+    setPending(true);
+
+    try {
+      loginMutation.mutate(values);
+    } catch (error) {
+      console.error("Login error:", error);
     } finally {
       setPending(false);
     }

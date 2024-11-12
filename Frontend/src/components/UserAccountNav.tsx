@@ -2,9 +2,10 @@ import React, { useMemo } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User } from "next-auth";
 import { LogOut, SeparatorHorizontal } from "lucide-react";
-import { handleLogoutAction } from "../../action/authAction";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { get } from "http";
+import getSession from "@/app/SessionProvider";
 
 interface UserAccountNavProps {
   user: Pick<User, "email" | "name">;
@@ -12,7 +13,6 @@ interface UserAccountNavProps {
 }
 
 const UserAccountNav = ({ user }: UserAccountNavProps) => {
-  const router = useRouter();
   const getEmailInitials = (email: string) => {
     if (!email || email.trim() === "") return ""; // Check if email is undefined, null, or empty
 
@@ -20,13 +20,13 @@ const UserAccountNav = ({ user }: UserAccountNavProps) => {
     return firstLetter;
   };
   const handleLogout = async () => {
-    const response = await handleLogoutAction();
-    router.refresh();
-    router.push("/employer/signin");
-    router.refresh();
+    localStorage.removeItem("session");
+    window.location.reload();
+    // router.push("/");
   };
 
   const initials = useMemo(() => getEmailInitials(user.email || ""), [user.email]);
+  const session = getSession();
   return (
     <>
       <div className="relative rounded-full hover:ring-2 hover:ring-blue-500 transition-all    group">
@@ -36,7 +36,12 @@ const UserAccountNav = ({ user }: UserAccountNavProps) => {
         </Avatar>
         <div className="absolute right-0 mt-4 w-48 rounded-md shadow-lg bg-white  ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
           <div className="divide-y divide-slate-500 px-4 py-2">
-            <div className="px-4 py-2">hello</div>
+            <div>
+              <div className="px-4">{session?.data?.name}</div>
+              <div className="px-4 mb-2 text-gray-400 text-xs">
+                <p>{session?.data?.email}</p>
+              </div>
+            </div>
             <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
               <a href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
                 Your Profile

@@ -5,22 +5,26 @@ import { Button } from "./ui/button";
 import { LogIn } from "lucide-react";
 import Link from "next/link";
 import { auth } from "../../auth";
-import { handleLogoutAction } from "../../action/authAction";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import UserAccountNav from "./UserAccountNav";
 import { User } from "next-auth";
+import getSession from "@/app/SessionProvider";
 
-interface HeaderProps {
-  session: any;
-  user: Pick<User, "email" | "name">;
-}
+// interface HeaderProps {
+//   session: any;
+//   user: Pick<User, "email" | "name">;
+// }
 
-export const Header = ({ user, session }: HeaderProps) => {
+export const Header = () => {
+  const session = getSession();
+
   return (
     <>
+      <p>{JSON.stringify(session)}</p>
       <header className="border-b">
         <div className="container max-w-8xl">
+          <p>{session?.data.name}</p>
           <nav className="flex items-center justify-between align-middle h-16">
             <Link href="/">
               <div className="textWrapper">
@@ -92,12 +96,7 @@ export const Header = ({ user, session }: HeaderProps) => {
             {session ? (
               <>
                 <div>
-                  <UserAccountNav
-                    user={{
-                      email: user.email,
-                      name: user.name,
-                    }}
-                  />
+                  <UserAccountNav user={{}} />
                 </div>
               </>
             ) : (

@@ -13,10 +13,12 @@ import { useRouter } from "next/navigation";
 import { handleLoginAction } from "../../action/authAction";
 import Swal from "sweetalert2";
 import { Eye, EyeOff } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { adminLoginService } from "../../authentication";
 
 export default function AdminLogin() {
   const router = useRouter();
-  // const [isLogin, setLogin] = useState(true);
+  const [isLogin, setLogin] = useState(true);
   const [isPending, setPending] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
@@ -49,68 +51,95 @@ export default function AdminLogin() {
     formState: { errors },
   } = form;
 
-  const handleLogin = async (values: logFormValues) => {
-    setPending(true);
-    try {
-      const response = await handleLoginAction(values);
-      console.log({ response });
-      if (response.error) {
-        Toast.fire({
-          icon: "error",
-          title: `${response.message}`,
-        });
-      }
+  const loginMutation = useMutation({
+    mutationFn: adminLoginService,
+    onSuccess: (data) => {
       Toast.fire({
         icon: "success",
-        title: "Signed in successfully",
+        title: `${data.message}`,
       });
-      router.refresh();
+      console.log("---------data----------", data);
+      // window.location.href = "/";
       router.push("/");
-      router.refresh();
-    } catch (error: any) {
+    },
+    onError: (data) => {
       Toast.fire({
         icon: "error",
-        title: `${error.message}`,
+        title: `${data.message}`,
       });
-    } finally {
-      setPending(false);
-    }
-  };
+      console.error("Login error:", data);
+    },
+  });
 
-  const onSubmit = async (values: logFormValues) => {
+  const handleLogin = async (values: logFormValues) => {
     setPending(true);
+
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/jobseeker/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-      console.log(response);
-      if (response?.ok) {
-        Toast.fire({
-          icon: "success",
-          title: "Account created successfully",
-        });
-        console.log("Account created successfully");
-        // setLogin(true);
-        // print values
-        console.log(values);
-      }
+      loginMutation.mutate(values);
     } catch (error) {
-      console.error(error);
-      Toast.fire({
-        icon: "error",
-        title: "Signup failed!",
-      });
-    } finally {
-      setPending(false);
+      console.error("Login error:", error);
     }
+
+    // try {
+    //   const response = await handleLoginAction(values);
+    //   console.log({ response });
+    //   if (response.error) {
+    //     Toast.fire({
+    //       icon: "error",
+    //       title: `${response.message}`,
+    //     });
+    //   }
+    //   Toast.fire({
+    //     icon: "success",
+    //     title: "Signed in successfully",
+    //   });
+    //   router.refresh();
+    //   router.push("/");
+    //   router.refresh();
+    // } catch (error: any) {
+    //   Toast.fire({
+    //     icon: "error",
+    //     title: `${error.message}`,
+    //   });
+    // } finally {
+    //   setPending(false);
+    // }
   };
 
-  // const onSubmit = (values: logFormValues | regFormValues) => {
-  //   if (isLogin) handleLogin(values as logFormValues);
-  //   else handleRegister(values as regFormValues);
+  // const onSubmit = async (values: logFormValues) => {
+  //   setPending(true);
+  //   try {
+  //     const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/jobseeker/register`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(values),
+  //     });
+  //     console.log(response);
+  //     if (response?.ok) {
+  //       Toast.fire({
+  //         icon: "success",
+  //         title: "Account created successfully",
+  //       });
+  //       console.log("Account created successfully");
+  //       // setLogin(true);
+  //       // print values
+  //       console.log(values);
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     Toast.fire({
+  //       icon: "error",
+  //       title: "Signup failed!",
+  //     });
+  //   } finally {
+  //     setPending(false);
+  //   }
   // };
+
+  const onSubmit = (values: logFormValues) => {
+    if (isLogin) handleLogin(values as logFormValues);
+    else handleLogin(values as logFormValues);
+  };
 
   return (
     <div className="min-h-screen gird place-content-center mx-auto">

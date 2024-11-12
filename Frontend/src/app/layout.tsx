@@ -4,8 +4,8 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import Footer from "@/components/Footer";
 import { auth } from "../../auth";
-import { useQuery, useMutation, useQueryClient, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import QCProviderComponent from "../../providers/queryClient";
+import { SessionProvider } from "./SessionProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -18,16 +18,16 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const getSession = await auth(); // Fetch session data on the server side
-
   return (
     <html lang="en">
       <body className={inter.className}>
         <QCProviderComponent>
-          <Header session={getSession} user={getSession?.user as any} />
-          {/* <p>{JSON.stringify(getSession)}</p> */}
-          {children}
-          <Footer />
+          <SessionProvider>
+            <Header />
+            {/* <p>dcdsc</p> */}
+            {children}
+            <Footer />
+          </SessionProvider>
         </QCProviderComponent>
       </body>
     </html>
