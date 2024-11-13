@@ -14,9 +14,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Controller } from "react-hook-form";
-import getSession from "@/app/SessionProvider";
+import { useSession } from "@/app/SessionProvider";
 
 const fetchJobCategories = async (token: string) => {
+
   const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/employer/job-category/list`, {
     method: "GET",
     headers: {
@@ -34,7 +35,7 @@ const fetchJobCategories = async (token: string) => {
 export default function JobCreationForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const session = getSession();
+  const session = useSession();
 
   type createJobForm = z.infer<typeof jobCreateValidation>;
 
@@ -44,9 +45,9 @@ export default function JobCreationForm() {
       job_category_id: "",
       title: "",
       job_description: "",
-      number_of_openings: "",
+      number_of_openings: 0,
       job_location: "",
-      salary: "",
+      salary: 0,
       job_level: "",
       education_requirement: "",
       experience: "",
@@ -123,8 +124,6 @@ export default function JobCreationForm() {
   const onSubmit = async (formData: createJobForm) => {
     setIsSubmitting(true);
     console.log("Form data:", formData);
-    // console.log every form data types
-
     console.log("Job Category ID:", typeof formData.job_category_id);
     console.log("Title:", typeof formData.title);
     console.log("Job Description:", typeof formData.job_description);
@@ -207,7 +206,7 @@ export default function JobCreationForm() {
                 <Label htmlFor="number_of_openings" className="text-sm font-medium text-gray-700">
                   Number of Openings
                 </Label>
-                <Input id="number_of_openings" type="text" {...register("number_of_openings")} />
+                <Input id="number_of_openings" type="number" {...register("number_of_openings")} />
                 {errors.number_of_openings && <p className="text-xs text-red-500">{errors.number_of_openings.message}</p>}
               </div>
               <div className="space-y-2">

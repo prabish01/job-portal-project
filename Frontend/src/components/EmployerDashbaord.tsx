@@ -2,20 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, Briefcase, Users, Eye } from "lucide-react";
-import { get } from "http";
+import { PlusCircle, Briefcase, Users, Eye, CheckCircle2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import getSession from "@/app/SessionProvider";
+import { useSession } from "@/app/SessionProvider";
 
 type JobData = {
   data: any[];
   job: any;
 };
-export default function EmployerDashboard() {
-  const session = getSession();
-  //   const [jobData, setJobData] = useState<JobData | null>(null);
+
+export default function Component() {
+  const session = useSession();
 
   const { isPending, error, data } = useQuery<JobData>({
     queryKey: ["jobListData"],
@@ -24,19 +24,17 @@ export default function EmployerDashboard() {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${session?.token}`, // Pass Bearer token here
+          Authorization: `Bearer ${session?.token}`,
         },
       }).then((res) => res.json()),
   });
 
   if (isPending) return "Loading...";
-
   if (error) return "An error has occurred: " + error.message;
 
   return (
     <div className="container min-h-screen mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Welcome back, {session?.name}</h1>
-      {/* print job name */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -52,34 +50,18 @@ export default function EmployerDashboard() {
             <CardTitle className="text-sm font-medium">Total Applicants</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>{/* <div className="text-2xl font-bold">{jobPostings.reduce((sum, job) => sum + job.applicants, 0)}</div> */}</CardContent>
+          <CardContent></CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">New Applications</CardTitle>
             <Eye className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
-          <CardContent>{/* <div className="text-2xl font-bold">{recentApplications.length}</div> */}</CardContent>
+          <CardContent></CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Job Postings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {data.data?.map((job: any) => (
-                <li key={job.id} className="flex  justify-between items-center">
-                  <span className="hover:bg-gray-100 cursor-pointer w-full rounded-lg p-2">{job.title}</span>
-                  {/* <span className="text-sm text-muted-foreground">{job.applicants} applicants</span> */}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-
+      <div className=" gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Recent Applications</CardTitle>
@@ -89,13 +71,48 @@ export default function EmployerDashboard() {
       </div>
 
       <div className="mt-6 flex justify-end space-x-4">
-        <Link href="/employer/postjob">
-          <Button>
-            <PlusCircle className="mr-2 h-4 w-4" /> Post New Job
-          </Button>
-        </Link>
-
         <Button variant="outline">View All Applications</Button>
+      </div>
+      <div className="mt-5">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between justify-items-center">
+            <CardTitle>Recent Job Postings</CardTitle>
+            <Link href="/employer/postjob">
+              <Button>
+                <PlusCircle className="mr-2 h-4 w-4" /> Post New Job
+              </Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              {data.data?.map((job: any) => (
+                <div key={job.id} className="space-y-2 border rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-50">
+                      Applied
+                    </Badge>
+                    <span className="text-sm text-muted-foreground">Posted 2 months ago</span>
+                  </div>
+                  <h3 className="font-semibold text-lg">{job.title}</h3>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center">
+                      <CheckCircle2 className="h-4 w-4 mr-1 text-green-500" />
+                      Payment verified
+                    </div>
+                    <span>•</span>
+                    <div className="flex items-center">★★★★★ 5.0</div>
+                    <span>•</span>
+                    <div>${job.salary || "Competitive"}</div>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {job.type || "Full-time"} • {job.location || "Remote"} • Est. time: {job.duration || "Not specified"}
+                  </div>
+                  <p className="text-sm line-clamp-2">{job.description || "No description provided"}</p>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

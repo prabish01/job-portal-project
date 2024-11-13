@@ -1,37 +1,39 @@
 "use client";
 
-import { useEffect, useState, createContext, useContext, ReactNode } from "react";
-import { fetchSession } from "./sessionUtils";
+import { createContext, useContext, ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
 
-// Define the context type to include session data or null
 interface SessionContextType {
   session: any | null;
 }
 
-// Create the context with a default value of null
-const SessionContext = createContext<SessionContextType | undefined>(undefined);
+const SessionContext = createContext<SessionContextType>({ session: null });
 
 interface SessionProviderProps {
   children: ReactNode;
 }
 
 export function SessionProvider({ children }: SessionProviderProps) {
-  const [session, setSession] = useState<any | null>(null);
-
-  useEffect(() => {
-    // Fetch the session from localStorage on the client side
-    const sessionData = fetchSession();
-    setSession(sessionData);
-  }, []);
+  const { data: session } = useQuery({
+    queryKey: ["session"],
+    queryFn: () => {
+      const sessionData = localStorage.getItem("session");
+      if (sessionData) {
+        document.cookie = `sessionToken=${sessionData}; path=/`;
+        return JSON.parse(sessionData);
+      }
+      return null;
+    },
+    staleTime: Infinity,
+  });
 
   return <SessionContext.Provider value={{ session }}>{children}</SessionContext.Provider>;
 }
 
-// Custom function to get the session context
-export default function getSession() {
+export function useSession() {
   const context = useContext(SessionContext);
-  if (context === undefined) {
-    throw new Error("getSession must be used within a SessionProvider");
+  if (!context) {
+    throw new Error("useSession must be used within a SessionProvider");
   }
   return context.session;
 }

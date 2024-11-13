@@ -1,13 +1,12 @@
 "use client";
 
-import BrowseSection from "@/components/BrowseSection";
+import BrowseSection from "@/components/CategorySection";
 import JobLists from "@/components/JobLists";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { auth } from "../../auth";
 import { SessionProvider } from "./SessionProvider";
 
-export default async function Home() {
+export default function Home() {
   return (
     <SessionProvider>
       <section className="mt-32 mb-32">

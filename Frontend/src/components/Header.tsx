@@ -4,12 +4,11 @@ import React from "react";
 import { Button } from "./ui/button";
 import { LogIn } from "lucide-react";
 import Link from "next/link";
-import { auth } from "../../auth";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import UserAccountNav from "./UserAccountNav";
 import { User } from "next-auth";
-import getSession from "@/app/SessionProvider";
+import { useSession } from "@/app/SessionProvider";
 
 // interface HeaderProps {
 //   session: any;
@@ -17,7 +16,7 @@ import getSession from "@/app/SessionProvider";
 // }
 
 export const Header = () => {
-  const session = getSession();
+  const session = useSession();
 
   return (
     <>

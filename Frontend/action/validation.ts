@@ -111,14 +111,20 @@ export const jobCreateValidation = z.object({
   job_category_id: z.string().min(1, "Category is required"),
   job_description: z.string().min(1, "Description is required"),
   job_location: z.string().min(1, "Location is required"),
-  salary: z.coerce
+  salary: z.z.coerce
     .number({
       required_error: "Salary is required",
       invalid_type_error: "Salary must be a  number",
     })
     .int()
     .min(1, "Salary must be a positive number"),
-  number_of_openings: z.string().min(1, "Number of openings is required"),
+  number_of_openings: z.coerce
+    .number({
+      required_error: "Number of opening is required",
+      invalid_type_error: "Number of opening must be a  number",
+    })
+    .int()
+    .min(1, "Number of opening must be a positive number"),
   education_requirement: z.string().min(1, "Education requirement is required"),
   experience: z.string().min(1, "Experience is required"),
   paid_amount: z.string().min(1, "Paid amount is required"),

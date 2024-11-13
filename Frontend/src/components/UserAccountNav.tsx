@@ -5,7 +5,7 @@ import { LogOut, SeparatorHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { get } from "http";
-import getSession from "@/app/SessionProvider";
+import { useSession } from "@/app/SessionProvider";
 
 interface UserAccountNavProps {
   user: Pick<User, "email" | "name">;
@@ -26,7 +26,7 @@ const UserAccountNav = ({ user }: UserAccountNavProps) => {
   };
 
   const initials = useMemo(() => getEmailInitials(user.email || ""), [user.email]);
-  const session = getSession();
+  const session = useSession();
   return (
     <>
       <div className="relative rounded-full hover:ring-2 hover:ring-blue-500 transition-all    group">

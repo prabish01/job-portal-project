@@ -4,8 +4,6 @@ import React from "react";
 import { Button } from "./ui/button";
 import { LogIn } from "lucide-react";
 import Link from "next/link";
-import { auth } from "../../auth";
-import { handleLogoutAction } from "../../action/authAction";
 import { useRouter } from "next/navigation";
 import Swal from "sweetalert2";
 import UserAccountNav from "./UserAccountNav";

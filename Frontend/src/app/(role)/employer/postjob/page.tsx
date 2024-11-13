@@ -1,12 +1,12 @@
-import EmployerPostJob from '@/components/EmployerPostJob'
-import React from 'react'
-import { auth } from '../../../../../auth';
+import EmployerPostJob from "@/components/EmployerPostJob";
+import React from "react";
 
-const page = async() => {
-    const getSession = await auth();
+const page = async () => {
   return (
-    <div><EmployerPostJob session={getSession} user={getSession?.user}/></div>
-  )
-}
+    <div>
+      <EmployerPostJob />
+    </div>
+  );
+};
 
-export default page
+export default page;
