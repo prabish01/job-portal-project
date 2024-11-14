@@ -12,7 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { profileFormValidation } from "../../action/validation"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useForm, useFieldArray } from "react-hook-form"
 import Swal from "sweetalert2"
 
 // Define prop types
@@ -102,8 +102,8 @@ export default function JobSeekerProfile({ session, user }: JobSeekerProfileProp
   })
 
   // Education and work experience management
-  const { fields: educations, append: appendEducation, remove: removeEducation } = JsProfileForm.useFieldArray({ name: "educations" })
-  const { fields: workExperiences, append: appendWorkExperience, remove: removeWorkExperience } = JsProfileForm.useFieldArray({ name: "work_experiences" })
+  const { fields: educations, append: appendEducation, remove: removeEducation } = useFieldArray({ control: JsProfileForm.control, name: "educations" })
+  const { fields: workExperiences, append: appendWorkExperience, remove: removeWorkExperience } = useFieldArray({ control: JsProfileForm.control, name: "work_experiences" })
 
   // Form submission
   const onSubmit = async (values: z.infer<typeof profileFormValidation>) => {
@@ -162,7 +162,7 @@ export default function JobSeekerProfile({ session, user }: JobSeekerProfileProp
               </div>
               
               {/* Personal information fields */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Name</Label>
                   <Input id="name" {...JsProfileForm.register("name")} value={name} onChange={(e) => setName(e.target.value)} placeholder="John Doe" />
@@ -179,7 +179,7 @@ export default function JobSeekerProfile({ session, user }: JobSeekerProfileProp
                   <Label htmlFor="mobile">Contact</Label>
                   <Input id="mobile" {...JsProfileForm.register("mobile")} value={mobile} onChange={(e) => setMobile(e.target.value)} placeholder="1234567890" />
                 </div>
-              </div>
+              </div> */}
               
               {/* Skills and professional summary */}
               <div className="space-y-2">

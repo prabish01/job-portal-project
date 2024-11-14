@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlusCircle, Briefcase, Users, Eye, CheckCircle2 } from "lucide-react";
+import { PlusCircle, Briefcase, Users, Eye, CheckCircle2, CircleX } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useSession } from "@/app/SessionProvider";
@@ -27,6 +27,7 @@ export default function Component() {
           Authorization: `Bearer ${session?.token}`,
         },
       }).then((res) => res.json()),
+    // enabled:!!id,
   });
 
   if (isPending) return "Loading...";
@@ -84,31 +85,44 @@ export default function Component() {
             </Link>
           </CardHeader>
           <CardContent>
-            <div className="space-y-6">
+            <div className="space-y-2 gap-4 ">
               {data.data?.map((job: any) => (
-                <div key={job.id} className="space-y-2 border rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-50">
+                <Link key={job.id} href={`/employer/dashboard/job/show/${job.id}`} passHref>
+                  <div className="space-y-2 mt-5 hover:bg-gray-100 border rounded-lg p-4">
+                    <div className=" ">
+                      {/* <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-50">
                       Applied
-                    </Badge>
-                    <span className="text-sm text-muted-foreground">Posted 2 months ago</span>
-                  </div>
-                  <h3 className="font-semibold text-lg">{job.title}</h3>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <div className="flex items-center">
-                      <CheckCircle2 className="h-4 w-4 mr-1 text-green-500" />
-                      Payment verified
+                    </Badge> */}
+                      <div className="text-sm text-right text-muted-foreground">Posted 2 months ago</div>
                     </div>
-                    <span>•</span>
-                    <div className="flex items-center">★★★★★ 5.0</div>
-                    <span>•</span>
-                    <div>${job.salary || "Competitive"}</div>
+                    <h3 className="font-semibold text-lg">{job.title}</h3>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <div className="flex items-center">
+                        {job.transaction_id ? (
+                          <>
+                            <CheckCircle2 className="h-4 w-4 mr-1 text-green-500" />
+                            <span className="text-green-500">Payment verified</span>
+                          </>
+                        ) : (
+                          <>
+                            <CircleX className="h-4 w-4 mr-1 text-red-500" />
+                            <span className="text-red-500">Payment not verified</span>
+                          </>
+                        )}
+                        {/* <CheckCircle2 className="h-4 w-4 mr-1 text-green-500" />
+                        Payment verified */}
+                      </div>
+                      <span>•</span>
+                      {/* <div className="flex items-center">★★★★★ 5.0</div> */}
+                      {/* <span>•</span> */}
+                      <div>${job.salary || "Competitive"}</div>
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      {job.type || "Full-time"} • {job.location || "Remote"} • Experience{""} {job.experience || "Not specified"}
+                    </div>
+                    <p className="text-sm flex-grow line-clamp-2">{job.job_description || "No description provided"}</p>
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    {job.type || "Full-time"} • {job.location || "Remote"} • Est. time: {job.duration || "Not specified"}
-                  </div>
-                  <p className="text-sm line-clamp-2">{job.description || "No description provided"}</p>
-                </div>
+                </Link>
               ))}
             </div>
           </CardContent>
