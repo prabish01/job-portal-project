@@ -60,7 +60,7 @@ export default function AdminLogin() {
       });
       console.log("---------data----------", data);
       // window.location.href = "/";
-      router.push("/");
+      router.push("/admin/dashboard");
     },
     onError: (data) => {
       Toast.fire({

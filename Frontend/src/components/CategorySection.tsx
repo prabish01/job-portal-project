@@ -23,7 +23,7 @@ const BrowseSection = () => {
       }).then((res) => res.json()),
   });
 
-  console.log({ data });
+  // console.log({ data });
   if (isPending) return "Loading...";
 
   if (error) return "An error has occurred: " + error.message;

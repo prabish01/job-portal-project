@@ -100,6 +100,7 @@ export default function JobCreationForm() {
         throw new Error(data.message || "Failed to create job");
       }
       return data;
+      
     },
     onSuccess: (data) => {
       Toast.fire({

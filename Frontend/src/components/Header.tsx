@@ -20,10 +20,10 @@ export const Header = () => {
 
   return (
     <>
-      <p>{JSON.stringify(session)}</p>
+      {/* <p>{JSON.stringify(session)}</p> */}
       <header className="border-b">
         <div className="container max-w-8xl">
-          <p>{session?.data.name}</p>
+          {/* <p>{session?.data.name}</p> */}
           <nav className="flex items-center justify-between align-middle h-16">
             <Link href="/">
               <div className="textWrapper">
@@ -32,7 +32,7 @@ export const Header = () => {
               </div>
             </Link>
 
-            <ul className="flex space-x-16">
+            {/* <ul className="flex space-x-16">
               <li className="relative  hover:text-blue-500 transition-all    group">
                 <a href="#" className="text-sm flex items-center h-16 hover:text-blue-500 transition-colors">
                   Job Category
@@ -90,12 +90,12 @@ export const Header = () => {
                   About us
                 </a>
               </li>
-            </ul>
+            </ul> */}
 
             {session ? (
               <>
                 <div>
-                  <UserAccountNav user={{}} />
+                  <UserAccountNav />
                 </div>
               </>
             ) : (

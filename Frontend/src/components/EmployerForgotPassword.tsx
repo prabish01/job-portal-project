@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 // import { resetPasswordValidation } from "../../../action/validation";
 import { useForm } from "react-hook-form";
 import { otpValidation, resetPassword, resetPasswordValidation } from "../../action/validation";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function Page() {
   const router = useRouter();

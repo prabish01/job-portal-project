@@ -2,33 +2,65 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { PlusCircle, Briefcase, Users, Eye, CheckCircle2, CircleX } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useSession } from "@/app/SessionProvider";
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 type JobData = {
   data: any[];
-  job: any;
+  meta: {
+    current_page: number;
+    last_page: number;
+    from: number;
+    to: number;
+    total: number;
+  };
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
 };
 
 export default function Component() {
   const session = useSession();
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const { isPending, error, data } = useQuery<JobData>({
-    queryKey: ["jobListData"],
+  const { isPending, error, data, refetch } = useQuery<JobData>({
+    queryKey: ["jobListData", currentPage],
     queryFn: () =>
-      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/employer/job/list`, {
+      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/employer/job/list?page=${currentPage}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session?.token}`,
         },
       }).then((res) => res.json()),
-    // enabled:!!id,
   });
+  const {
+    isPending: applicantPending,
+    error: applicantError,
+    data: applicantData,
+    // refetch,
+  } = useQuery<JobData>({
+    queryKey: ["applicantData", currentPage],
+    queryFn: () =>
+      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}//employer/job-applicant/list/${currentPage}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.token}`,
+        },
+      }).then((res) => res.json()),
+  });
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   if (isPending) return "Loading...";
   if (error) return "An error has occurred: " + error.message;
@@ -43,7 +75,7 @@ export default function Component() {
             <Briefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{data?.data.length}</div>
+            <div className="text-2xl font-bold">{data?.meta.total || 0}</div>
           </CardContent>
         </Card>
         <Card>
@@ -62,18 +94,21 @@ export default function Component() {
         </Card>
       </div>
 
-      <div className=" gap-6">
+      <div className="gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Recent Applications</CardTitle>
           </CardHeader>
-          <CardContent></CardContent>
+          <CardContent>
+
+          </CardContent>
         </Card>
       </div>
 
       <div className="mt-6 flex justify-end space-x-4">
         <Button variant="outline">View All Applications</Button>
       </div>
+
       <div className="mt-5">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between justify-items-center">
@@ -85,15 +120,12 @@ export default function Component() {
             </Link>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2 gap-4 ">
-              {data.data?.map((job: any) => (
+            <div className="space-y-2 gap-4">
+              {data?.data.map((job: any) => (
                 <Link key={job.id} href={`/employer/dashboard/job/show/${job.id}`} passHref>
                   <div className="space-y-2 mt-5 hover:bg-gray-100 border rounded-lg p-4">
-                    <div className=" ">
-                      {/* <Badge variant="secondary" className="bg-blue-50 text-blue-700 hover:bg-blue-50">
-                      Applied
-                    </Badge> */}
-                      <div className="text-sm text-right text-muted-foreground">Posted 2 months ago</div>
+                    <div>
+                      <div className="text-sm text-right text-muted-foreground">{job.created_at_ago_formatted}</div>
                     </div>
                     <h3 className="font-semibold text-lg">{job.title}</h3>
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -109,16 +141,12 @@ export default function Component() {
                             <span className="text-red-500">Payment not verified</span>
                           </>
                         )}
-                        {/* <CheckCircle2 className="h-4 w-4 mr-1 text-green-500" />
-                        Payment verified */}
                       </div>
                       <span>•</span>
-                      {/* <div className="flex items-center">★★★★★ 5.0</div> */}
-                      {/* <span>•</span> */}
                       <div>${job.salary || "Competitive"}</div>
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      {job.type || "Full-time"} • {job.location || "Remote"} • Experience{""} {job.experience || "Not specified"}
+                      {job.type || "Full-time"} • {job.job_location || "Remote"} • Experience{""} {job.experience || "Not specified"}
                     </div>
                     <p className="text-sm flex-grow line-clamp-2">{job.job_description || "No description provided"}</p>
                   </div>
@@ -126,6 +154,63 @@ export default function Component() {
               ))}
             </div>
           </CardContent>
+          <CardFooter className="flex justify-center">
+            <Pagination>
+              <PaginationContent>
+                {data?.meta.current_page > 1 && (
+                  <PaginationItem>
+                    <PaginationPrevious
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePageChange(data.meta.current_page - 1);
+                      }}
+                    />
+                  </PaginationItem>
+                )}
+
+                {Array.from({ length: data?.meta.last_page || 0 }).map((_, index) => {
+                  const page = index + 1;
+                  // Show first page, last page, and 2 pages around current page
+                  if (page === 1 || page === data?.meta.last_page || (page >= data?.meta.current_page - 1 && page <= data?.meta.current_page + 1)) {
+                    return (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          href="#"
+                          isActive={page === data?.meta.current_page}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handlePageChange(page);
+                          }}
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  } else if (page === data?.meta.current_page - 2 || page === data?.meta.current_page + 2) {
+                    return (
+                      <PaginationItem key={page}>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    );
+                  }
+                  return null;
+                })}
+
+                {data?.meta.current_page < (data?.meta.last_page || 0) && (
+                  <PaginationItem>
+                    <PaginationNext
+                      href="#"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handlePageChange(data.meta.current_page + 1);
+                      }}
+                    />
+                  </PaginationItem>
+                )}
+              </PaginationContent>
+            </Pagination>
+          </CardFooter>
         </Card>
       </div>
     </div>

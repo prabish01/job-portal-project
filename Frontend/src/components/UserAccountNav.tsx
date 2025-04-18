@@ -7,26 +7,26 @@ import { Button } from "@/components/ui/button";
 import { get } from "http";
 import { useSession } from "@/app/SessionProvider";
 
-interface UserAccountNavProps {
-  user: Pick<User, "email" | "name">;
-  email?: string;
-}
-
-const UserAccountNav = ({ user }: UserAccountNavProps) => {
-  const getEmailInitials = (email: string) => {
-    if (!email || email.trim() === "") return ""; // Check if email is undefined, null, or empty
-
-    const firstLetter = email.charAt(0).toUpperCase(); // Get the first character and convert it to uppercase
-    return firstLetter;
+const UserAccountNav = () => {
+  const session = useSession();
+  const getEmailInitials = () => {
+    if (!session?.data?.email || session.data.email.trim() === "") return "";
+    return session.data.email.charAt(0).toUpperCase();
   };
+
+  const initials = useMemo(() => getEmailInitials(), [session?.data?.email]);
+
+  const profileUrl = session?.role === "admin" ? "/admin/dashboard" : session?.role === "employer" ? "/employer/profile" : "/jobseeker/view-profile";
+  const dashboardUrl = session?.role === "admin" ? "/admin/dashboard" : session?.role === "employer" ? "/employer/dashboard" : "/jobseeker/dashboard";
+  const createProfileUrl = session?.role === "admin" ? "/admin/dashboard" : session?.role === "employer" ? "/employer/profile/create-profile" : "/jobseeker/createprofile";
   const handleLogout = async () => {
     localStorage.removeItem("session");
     window.location.reload();
+    window.location.href = "/";
     // router.push("/");
   };
 
-  const initials = useMemo(() => getEmailInitials(user.email || ""), [user.email]);
-  const session = useSession();
+  // const initials = useMemo(() => getEmailInitials(session.data.email || ""), [session.data.email]);
   return (
     <>
       <div className="relative rounded-full hover:ring-2 hover:ring-blue-500 transition-all    group">
@@ -43,14 +43,17 @@ const UserAccountNav = ({ user }: UserAccountNavProps) => {
               </div>
             </div>
             <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-              <a href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                Your Profile
+              <a href={profileUrl} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                View Profile
               </a>
-              <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                Change Password
-              </a>
-              <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                Job Activity
+              {session?.role === "employer" && (
+                <a href={dashboardUrl} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                  Dashboard
+                </a>
+              )}
+
+              <a href={createProfileUrl} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                Create Profile
               </a>
             </div>
             <div className=" w-full py-2">

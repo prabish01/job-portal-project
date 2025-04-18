@@ -64,7 +64,7 @@ export default function Page() {
         title: `${data.message}`,
       });
 
-      window.location.href = "/";
+      router.push("/jobseeker/createprofile");
     },
     onError: (data) => {
       Toast.fire({
@@ -240,7 +240,7 @@ export default function Page() {
 
             {!isLogin && (
               <>
-                <div className="w-full mt-5 mb-5">
+                {/* <div className="w-full mt-5 mb-5">
                   <div className="flex flex-row  items-center justify-around gap-5">
                     <div className=" flex flex-row items-center gap-5">
                       <p>Job Seeker</p>
@@ -259,7 +259,7 @@ export default function Page() {
                       <p>Job Provider</p>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </>
             )}
             <Button disabled={isPending} type="submit" className="w-full bg-green-500 hover:bg-green-600 text-white">

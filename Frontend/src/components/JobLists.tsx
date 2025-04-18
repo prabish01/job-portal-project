@@ -4,64 +4,30 @@ import { MapPin } from "lucide-react";
 import { Button } from "./ui/button";
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "./ui/sheet";
 import { FadeIn } from "./ui/FadeIn";
-
-const jobList = [
-  {
-    id: 1,
-    title: "Job Title",
-    category: "Job Category",
-    description: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it is a long established fact that a reader will be distracted by the rea...",
-    location: "Location",
-    salary: "$20,000 - 60,000",
-  },
-  {
-    id: 2,
-    title: "Job Title",
-    category: "Job Category",
-    description: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it is a long established fact that a reader will be distracted by the rea...",
-    location: "Location",
-    salary: "$20,000 - 60,000",
-  },
-  {
-    id: 3,
-    title: "Job Title",
-    category: "Job Category",
-    description: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it is a long established fact that a reader will be distracted by the rea...",
-    location: "Location",
-    salary: "$20,000 - 60,000",
-  },
-  {
-    id: 4,
-    title: "Job Title",
-    category: "Job Category",
-    description: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it is a long established fact that a reader will be distracted by the rea...",
-    location: "Location",
-    salary: "$20,000 - 60,000",
-  },
-  {
-    id: 5,
-    title: "Job Title",
-    category: "Job Category",
-    description: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it is a long established fact that a reader will be distracted by the rea...",
-    location: "Location",
-    salary: "$20,000 - 60,000",
-  },
-  {
-    id: 6,
-    title: "Job Title",
-    category: "Job Category",
-    description: "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it is a long established fact that a reader will be distracted by the rea...",
-    location: "Location",
-    salary: "$20,000 - 60,000",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
 
 const JobLists = () => {
+  const { isPending, error, data } = useQuery({
+    queryKey: ["fetchJobList"],
+    queryFn: () =>
+      fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/list-jobs`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          // Authorization: `Bearer ${session?.token}`, // Pass Bearer token here
+        },
+      }).then((res) => res.json()),
+  });
+
+  console.log({ data });
+  if (isPending) return "Loading...";
+
+  if (error) return "An error has occurred: " + error.message;
   return (
     <div className="mb-32 py-5">
       <section className="container p-0">
         <div className="grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {jobList.map((job) => (
+          {data?.data.map((job: any) => (
             <FadeIn key={job.id}>
               <Card className="flex flex-col duration:100 transition ease-in opacity-70 hover:opacity-100 ">
                 <CardHeader>
@@ -70,7 +36,10 @@ const JobLists = () => {
                   <div className="justify-end w-fit  bg-pink-100 text-pink-800 text-xs px-2 py-1 rounded-full">{job.category}</div>
                 </CardHeader>
                 <CardContent className="flex-grow">
-                  <p className="text-gray-600 text-sm">{job.description}</p>
+                  <p className="overflow-hidden text-gray-600 text-ellipsis line-clamp-3">
+                    A Car Sales Manager oversees the sales team at a dealership, sets sales goals, and implements strategies to meet revenue targets. They recruit, train, and mentor staff, manage inventory, analyze sales data, and ensure excellent customer service. This role requires leadership
+                    skills, industry knowledge, and the ability to drive team performance and profitability.
+                  </p>
                 </CardContent>
                 <CardFooter className="flex justify-between items-center">
                   <div className="flex items-center text-gray-600">

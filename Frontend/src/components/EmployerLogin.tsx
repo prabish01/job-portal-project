@@ -94,7 +94,9 @@ export default function Page() {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/employer/register`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify(values),
       });
       // console.log(response);

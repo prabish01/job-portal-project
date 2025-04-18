@@ -130,3 +130,13 @@ export const jobCreateValidation = z.object({
   paid_amount: z.string().min(1, "Paid amount is required"),
   job_level: z.string().min(1, "Job level is required"),
 });
+
+
+export const categoryNameValidation = z.object({  
+  name: z.string().min(1, "Category Name is required"),
+});
+
+
+export const applicantStatusValidation = z.object({
+  jobseeker_status: z.enum(["shortlisted", "rejected"]),
+});

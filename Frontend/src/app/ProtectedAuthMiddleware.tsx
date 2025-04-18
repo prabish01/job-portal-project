@@ -14,14 +14,13 @@ interface RouteConfig {
 }
 
 const routeConfig: RouteConfig = {
-  "/jobseeker": { requiresAuth: true, allowedRoles: ["jobseeker"], redirectTo: "/jobseeker/signin" },
-  "/employer": { requiresAuth: true, allowedRoles: ["employer"], redirectTo: "/employer/signin" },
-  "/admin": { requiresAuth: true, allowedRoles: ["admin"], redirectTo: "/admin/signin" },
+  "/jobseeker/*": { requiresAuth: true, allowedRoles: ["jobseeker"], redirectTo: "/jobseeker/signin" },
+  "/employer/*": { requiresAuth: true, allowedRoles: ["employer"], redirectTo: "/employer/signin" },
+  "/admin/*": { requiresAuth: true, allowedRoles: ["admin"], redirectTo: "/admin/signin" },
 
-  // Publicly accessible sign-in pages
   "/jobseeker/signin": { requiresAuth: false, redirectTo: "/jobseeker/profile" },
   "/employer/signin": { requiresAuth: false, redirectTo: "/employer/dashboard" },
-  "/admin/signin": { requiresAuth: false, redirectTo: "/" },
+  "/admin/signin": { requireqsAuth: false, redirectTo: "/" },
 };
 
 export function useAuthProtection(currentPath: string) {
